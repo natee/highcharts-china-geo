@@ -1,0 +1,28 @@
+{
+  "name": "highcharts-china-geo",
+  "version": "1.0.0",
+  "description": "highcharts中国地图，higcharts中国省市地图",
+  "main": "encode.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natee/highcharts-china-geo.git"
+  },
+  "keywords": [
+    "highcharts",
+    "china",
+    "中国",
+    "province"
+  ],
+  "author": "natee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/natee/highcharts-china-geo/issues"
+  },
+  "homepage": "https://github.com/natee/highcharts-china-geo#readme",
+  "dependencies": {
+    "glob": "^7.1.1"
+  }
+}

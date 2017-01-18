@@ -11,8 +11,7 @@ highchairs中国地图和中国各省地图geo数据。
 `transLatLonToCoordinate.js`把调用了Highcharts的一个坐标转换函数把经纬度转成坐标点数值，须修改后才可以使用。
 
 ### 修改
-1. 代码中有`$(".chart").highcharts()`，这是为了拿到highcharts实例然后进行转化，所以必须是有一个highcharts图表
-2. 代码中`f.properties['hz-code']`这里的`hz-code`为自定义的关联字段，highcharts中`joinBy`使用的名称。
+1. 代码中`f.properties['hz-code']`这里的`hz-code`为自定义的关联字段，highcharts中`joinBy`使用的名称。
 
 ### 执行
 `node transLatLonToCoordinate.js`
