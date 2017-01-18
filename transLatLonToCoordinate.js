@@ -129,9 +129,7 @@ function transProvince(a){
 }
 
 function addAMDWrapper(jsonStr,fileName) {
-    //var content = decode(jsonStr);
-    if(fileName === 'china_geo') return false; // 这个单独处理过
-
+   
     var json = JSON.parse(jsonStr);
     var result = transProvince(json);
 
