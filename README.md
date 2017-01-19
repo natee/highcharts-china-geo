@@ -20,8 +20,11 @@ highchairs中国地图和中国各省地图geo数据。
 ## 转换方法
 
 `transLatLonToCoordinate.js`中调用了Highcharts的一个坐标转换函数把经纬度转成坐标点数值，这里直接把这个函数抽出来，该函数依赖于proj4.js这个库。
+
 在执行转换之前，根据需要对代码进行修改：
+
 1. 代码中`f.properties['hz-code']`这里的`hz-code`为自定义的关联字段，highcharts中`joinBy`使用的名称。
+
 2. 国内经常有新增或合并某些区县（如天津的滨海新区、北京东城区和西城区等），这部分的数据暂时不做处理，可以自行增加后再处理。
 
 ### 执行
@@ -40,7 +43,7 @@ Highcharts.maps["countries/cn/an_hui_geo"] = {
 }
 ```
 
-例如，要取一个`mapPrefix`的地图文件：
+例如，要使用一个`mapPrefix`的地图文件（这里是按需请求地图文件，如果是一次性加载，就不必走if逻辑）：
 ```javascript
 var mapAreaData = Highcharts.maps['countries/cn/' + mapPrefix + '_geo'];
 if (!mapAreaData) {
