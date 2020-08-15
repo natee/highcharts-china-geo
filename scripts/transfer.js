@@ -32,10 +32,11 @@ const path = require("path");
 const glob = require("glob");
 const chalk = require("chalk");
 const proj4 = require(path.resolve(__dirname, "./proj4.js"));
+const log = console.log;
 
+const args = process.argv.slice(2);
 const sourceDir = path.resolve(__dirname, "../latlng");
 const targetDir = path.resolve(__dirname, "../highmaps");
-const log = console.log;
 const isArray = obj => Object.prototype.toString.call(obj) === "[object Array]";
 
 const transform = {
@@ -55,6 +56,9 @@ const crs = {
     name: "urn:ogc:def:crs:EPSG:3415",
   },
 };
+
+const joinBy = args[0] || "hz-code";
+log(chalk.bgMagenta('joinBy:', joinBy))
 
 startTransfer();
 
@@ -170,7 +174,7 @@ function transferGeo(geo) {
       }
       
       if (adcode.length === 6) {
-        f.properties["hz-code"] = Number(adcode);
+        f.properties[joinBy] = Number(adcode);
       }
 
       const coordinates = f.geometry.coordinates; // [[[经度，纬度],[经度，纬度]],[]]

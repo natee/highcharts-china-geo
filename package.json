@@ -4,7 +4,7 @@
   "description": "highcharts中国地图，higcharts中国省市地图",
   "scripts": {
     "download": "node ./scripts/download.js",
-    "transfer": "node ./scripts/transfer.js",
+    "transfer": "node ./scripts/transfer.js $*",
     "clear": "rm ./highmaps/*",
     "clear_geo": "rm ./latlng/*"
   },
