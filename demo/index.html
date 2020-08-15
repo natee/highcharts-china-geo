@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Highcharts 中国地图示例</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.0.0-rc.5/vue.global.prod.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/proj4js/2.6.2/proj4-src.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/highmaps/6.0.3/highmaps.js"></script>
+    <script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div
+        id="container"
+        style="
+          height: 500px;
+          min-width: 310px;
+          max-width: 800px;
+          margin: 0 auto;
+        "
+      ></div>
+    </div>
+    <script>
+      // const { createApp } = Vue;
+      // console.log(createApp)
+      // createApp(App).mount('#app')
+
+      function fetchGeoData(){
+        return fetch('https://geo.datav.aliyun.com/areas_v2/bound/100000_full.json')
+        .then(function(response) {
+          return response.json();
+        }).then(data => {
+          data["hc-transform"] = {
+            "default": {
+                "crs": "+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
+            }
+          }
+          return data
+        })
+      }
+
+
+      async function getData(){
+        const map = await fetchGeoData();
+        console.log(map)
+
+        map.features.forEach((i, key) => {
+          i.drilldown = i.properties["hc-key"];
+          i.value = key;
+        });
+
+        drawChart(map)
+      }
+
+      function drawChart(mapData){
+        Highcharts.mapChart("container", {
+          chart: {
+            events: {
+              drilldown: function (e) {
+                if (!e.seriesOptions) {
+                  var chart = this,
+                    mapKey = "countries/us/" + e.point.drilldown + "-all",
+                    // Handle error, the timeout is cleared on success
+                    fail = setTimeout(function () {
+                      if (!Highcharts.maps[mapKey]) {
+                        chart.showLoading(
+                          '<i class="icon-frown"></i> Failed loading ' +
+                            e.point.name
+                        );
+                        fail = setTimeout(function () {
+                          chart.hideLoading();
+                        }, 1000);
+                      }
+                    }, 3000);
+
+                  // Show the spinner
+                  chart.showLoading(
+                    '<i class="icon-spinner icon-spin icon-3x"></i>'
+                  ); // Font Awesome spinner
+
+                  // Load the drilldown map
+                  $.getScript(
+                    "https://code.highcharts.com/mapdata/" + mapKey + ".js",
+                    function () {
+                      data = Highcharts.geojson(Highcharts.maps[mapKey]);
+
+                      // Set a non-random bogus value
+                      $.each(data, function (i) {
+                        this.value = i;
+                      });
+
+                      // Hide loading and add series
+                      chart.hideLoading();
+                      clearTimeout(fail);
+                      chart.addSeriesAsDrilldown(e.point, {
+                        name: e.point.name,
+                        data: data,
+                        dataLabels: {
+                          enabled: true,
+                          format: "{point.name}",
+                        },
+                      });
+                    }
+                  );
+                }
+
+                this.setTitle(null, { text: e.point.name });
+              },
+              drillup: function () {
+                this.setTitle(null, { text: "" });
+              },
+            },
+          },
+
+          title: {
+            text: "Highcharts 中国(省市)地图使用示例",
+          },
+          colorAxis: {
+            min: 0,
+            minColor: "#E6E7E8",
+            maxColor: "#005645",
+          },
+          plotOptions: {
+            map: {
+              states: {
+                hover: {
+                  color: "darkred",
+                },
+              },
+            },
+          },
+          series: [
+            {
+              data: mapData,
+              name: "USA",
+              dataLabels: {
+                enabled: true,
+                format: "{point.properties.postal-code}",
+              },
+            }
+          ],
+
+          drilldown: {
+            activeDataLabelStyle: {
+              color: "#FFFFFF",
+              textDecoration: "none",
+              textOutline: "1px #000000",
+            },
+            drillUpButton: {
+              relativeTo: "spacingBox",
+              position: {
+                x: 0,
+                y: 60,
+              },
+            },
+          },
+        });
+      }
+
+      getData()
+
+      let data = Highcharts.geojson(Highcharts.maps["countries/us/us-all"]);
+
+      // data = Highcharts.maps["countries/cn/cn-all"] = getData()
+      console.log(data)
+
+    </script>
+  </body>
+</html>
