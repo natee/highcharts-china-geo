@@ -52,7 +52,7 @@ const options = {
 详细代码可以参看 `/demo/index.html`。
 
 ### 在线示例
-[Highcharts 中国地图示例](../demo/index.html)
+[Highcharts 中国地图示例](http://natee.github.io/highcharts-china-geo/demo/index.html)
 
 ### Q & A
 1. 如何修改 `joinBy`？
