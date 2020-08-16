@@ -4,112 +4,92 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Highcharts 中国地图示例</title>
-    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.0.0-rc.5/vue.global.prod.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/proj4js/2.6.2/proj4-src.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/highmaps/6.0.3/highmaps.js"></script>
-    <script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/data.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/drilldown.js"></script>
+    <style>
+      :root {
+        --demo-bg-color: #13161a;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        /* background-color: var(--demo-bg-color); */
+      }
+      #container {
+        width: 100vw;
+        height: 100vh;
+        margin: 0 auto;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
-      <div
-        id="container"
-        style="
-          height: 500px;
-          min-width: 310px;
-          max-width: 800px;
-          margin: 0 auto;
-        "
-      ></div>
+      <div id="container"></div>
     </div>
-    <script>
-      // const { createApp } = Vue;
-      // console.log(createApp)
-      // createApp(App).mount('#app')
+    <script type="module">
+      import { loadScript, mockData, hasChildRegion } from "./utils.js";
+      getData(100000, drawChart);
 
-      function fetchGeoData(){
-        return fetch('https://geo.datav.aliyun.com/areas_v2/bound/100000_full.json')
-        .then(function(response) {
-          return response.json();
-        }).then(data => {
-          data["hc-transform"] = {
-            "default": {
-                "crs": "+proj=lcc +lat_1=33 +lat_2=45 +lat_0=39 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
-            }
-          }
-          return data
+      async function getData(adcode, callback) {
+        Promise.all([loadMapData(adcode), loadChartData(adcode)])
+        .then(res => {
+          callback.apply(null, res)
         })
       }
 
-
-      async function getData(){
-        const map = await fetchGeoData();
-        console.log(map)
-
-        map.features.forEach((i, key) => {
-          i.drilldown = i.properties["hc-key"];
-          i.value = key;
-        });
-
-        drawChart(map)
+      async function loadMapData(adcode){
+        const hasChildren = hasChildRegion(adcode);
+        const fileName = `${adcode}${hasChildren ? "_full" : ""}`;
+        await loadScript(`/highmaps/${fileName}.js`);
+        return Highcharts.maps[`countries/cn/${fileName}`];
       }
 
-      function drawChart(mapData){
+      async function loadChartData(adcode){
+        const data = await mockData(adcode);
+        data.forEach((i, key) => {
+          i.drilldown = i.adcode;
+        });
+        return data
+      }
+
+      function drawChart(mapData, data) {
         Highcharts.mapChart("container", {
+          lang: {
+            drillUpText: '返回 {series.name}'
+          },
           chart: {
+            backgroundColor: "none",
             events: {
               drilldown: function (e) {
+                /**
+                 * 下钻的逻辑也不用完全按照这个思路
+                 * 可以直接调用 getData(adcode, drawChart) 重新渲染图表，
+                 * 这样你需要单独处理钻取的面包屑
+                 */
                 if (!e.seriesOptions) {
-                  var chart = this,
-                    mapKey = "countries/us/" + e.point.drilldown + "-all",
-                    // Handle error, the timeout is cleared on success
-                    fail = setTimeout(function () {
-                      if (!Highcharts.maps[mapKey]) {
-                        chart.showLoading(
-                          '<i class="icon-frown"></i> Failed loading ' +
-                            e.point.name
-                        );
-                        fail = setTimeout(function () {
-                          chart.hideLoading();
-                        }, 1000);
-                      }
-                    }, 3000);
-
-                  // Show the spinner
-                  chart.showLoading(
-                    '<i class="icon-spinner icon-spin icon-3x"></i>'
-                  ); // Font Awesome spinner
-
-                  // Load the drilldown map
-                  $.getScript(
-                    "https://code.highcharts.com/mapdata/" + mapKey + ".js",
-                    function () {
-                      data = Highcharts.geojson(Highcharts.maps[mapKey]);
-
-                      // Set a non-random bogus value
-                      $.each(data, function (i) {
-                        this.value = i;
-                      });
-
-                      // Hide loading and add series
-                      chart.hideLoading();
-                      clearTimeout(fail);
-                      chart.addSeriesAsDrilldown(e.point, {
-                        name: e.point.name,
-                        data: data,
-                        dataLabels: {
-                          enabled: true,
-                          format: "{point.name}",
-                        },
-                      });
-                    }
-                  );
+                  const subAdcode = e.point.drilldown;
+                  if(!hasChildRegion(subAdcode)){
+                    return;
+                  }
+                  const chart = this;
+                  chart.showLoading(`<i class="icon-frown"></i> 请求数据... ${e.point.name}`);
+                  getData(subAdcode, (mapData, data) => {
+                    chart.hideLoading();
+                    chart.addSeriesAsDrilldown(e.point, {
+                      joinBy: "adcode",
+                      name: e.point.name,
+                      mapData: mapData,
+                      data: data,
+                      dataLabels: {
+                        enabled: true,
+                        format: "{point.name}",
+                      },
+                    });
+                  });
                 }
-
-                this.setTitle(null, { text: e.point.name });
-              },
-              drillup: function () {
-                this.setTitle(null, { text: "" });
-              },
+              }
+              
             },
           },
 
@@ -118,27 +98,25 @@
           },
           colorAxis: {
             min: 0,
-            minColor: "#E6E7E8",
-            maxColor: "#005645",
+            minColor: "#f12711",
+            maxColor: "#f5af19",
           },
           plotOptions: {
             map: {
-              states: {
-                hover: {
-                  color: "darkred",
-                },
-              },
+              borderColor: "#FFFFD0",
             },
           },
           series: [
             {
-              data: mapData,
-              name: "USA",
+              joinBy: "adcode",
+              mapData: mapData,
+              name: "全国数据",
               dataLabels: {
                 enabled: true,
-                format: "{point.properties.postal-code}",
+                format: "{point.name}",
               },
-            }
+              data: data,
+            },
           ],
 
           drilldown: {
@@ -157,14 +135,6 @@
           },
         });
       }
-
-      getData()
-
-      let data = Highcharts.geojson(Highcharts.maps["countries/us/us-all"]);
-
-      // data = Highcharts.maps["countries/cn/cn-all"] = getData()
-      console.log(data)
-
     </script>
   </body>
 </html>

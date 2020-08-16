@@ -57,7 +57,7 @@ const crs = {
   },
 };
 
-const joinBy = args[0] || "hz-code";
+const joinBy = args[0] || "adcode";
 log(chalk.bgMagenta('joinBy:', joinBy))
 
 startTransfer();
