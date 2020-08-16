@@ -1,6 +1,6 @@
 # Highcharts-china-geo
 
-Highchairs 中国地图和中国各省市（下至县级市、区）地图 geo 数据。
+Highcharts 中国地图和中国各省市（下至县级市、区）地图 geo 数据。
 
 ## 数据
 
