@@ -23,6 +23,7 @@ const datavDomain = "https://geo.datav.aliyun.com/areas_v2/bound/";
 const raw = fs.readFileSync(adCodePath, "utf8");
 const adCodeObj = JSON.parse(raw)
 const allCodes = Object.keys(adCodeObj);
+const special = ["710000"]; // 台湾省目前没有子区域，会造成错误判断
 
 downloadGeo()
 
@@ -34,7 +35,7 @@ function downloadGeo(){
 
   allCodes.forEach((code, index) => {
     // if(index < 10){
-    const hasChildren = adCodeObj[code].children.length > 0;
+    const hasChildren = special.includes(code) || adCodeObj[code].children.length > 0;
     download(code, hasChildren);
     // }
   })
