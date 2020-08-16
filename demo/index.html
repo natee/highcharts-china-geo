@@ -41,7 +41,7 @@
       async function loadMapData(adcode){
         const hasChildren = hasChildRegion(adcode);
         const fileName = `${adcode}${hasChildren ? "_full" : ""}`;
-        await loadScript(`/highmaps/${fileName}.js`);
+        await loadScript(`../highmaps/${fileName}.js`);
         return Highcharts.maps[`countries/cn/${fileName}`];
       }
 
