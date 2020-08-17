@@ -21,7 +21,8 @@ export function hasChildRegion(code) {
 }
 
 export async function mockData(adcode) {
-  const data = await fetchJson("../utils/infos.json");
+  adcode = adcode === "china" ? "100000" : adcode;
+  const data = await fetchJson("../info/infos.json");
   const region = data[adcode];
   if (region.children.length === 0) {
     return [{

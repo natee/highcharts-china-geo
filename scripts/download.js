@@ -8,7 +8,7 @@ const chalk = require('chalk');
 // const readFileAsync = promisify(fs.readFile);
 
 const destDir = path.resolve(__dirname, "../latlng");
-const adCodePath = path.resolve(__dirname, "../utils/infos.json");
+const adCodePath = path.resolve(__dirname, "../info/infos.json");
 const log = console.log;
 
 /**
@@ -60,4 +60,8 @@ function download(code, isFull) {
       // log(chalk.yellow(`文件 ${fileName} 已存在`))
     }
   });
+}
+
+module.exports = {
+  adCodeObj
 }

@@ -18,18 +18,22 @@
       }
       #container {
         width: 100vw;
-        height: 100vh;
+        /* height: 90vh; */
+        height: 400px;
         margin: 0 auto;
       }
     </style>
   </head>
   <body>
     <div id="app">
+      <div class="handler">
+        <button id="toggle">切换南海诸岛</button>
+      </div>
       <div id="container"></div>
     </div>
     <script type="module">
       import { loadScript, mockData, hasChildRegion } from "./utils.js";
-      getData(100000, drawChart);
+      getData('china', drawChart);
 
       async function getData(adcode, callback) {
         Promise.all([loadMapData(adcode), loadChartData(adcode)])
@@ -40,7 +44,10 @@
 
       async function loadMapData(adcode){
         const hasChildren = hasChildRegion(adcode);
-        const fileName = `${adcode}${hasChildren ? "_full" : ""}`;
+        let fileName = `${adcode}${hasChildren ? "_full" : ""}`;
+        if(adcode === "china"){
+          fileName = adcode;
+        }
         await loadScript(`../highmaps/${fileName}.js`);
         return Highcharts.maps[`countries/cn/${fileName}`];
       }
@@ -103,7 +110,7 @@
           },
           plotOptions: {
             map: {
-              borderColor: "#FFFFD0",
+              borderColor: "red",
             },
           },
           series: [
@@ -135,6 +142,12 @@
           },
         });
       }
+
+      let flag = 1;
+      document.querySelector("#toggle").addEventListener("click", () => {
+        flag++
+        getData(flag % 2 ? 'china' : '100000', drawChart);
+      })
     </script>
   </body>
 </html>

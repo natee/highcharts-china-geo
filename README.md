@@ -2,6 +2,10 @@
 
 Highcharts 中国地图和中国各省市（下至县级市、区）地图 geo 数据。
 
+![](assets/down.png)
+
+![](assets/right.png)
+
 ## 数据
 
 - `latlng/` ：地图的经纬度坐标geo数据，来自[阿里云 DavaV](http://datav.aliyun.com/tools/atlas/#&lat=31.769817845138945&lng=104.29901249999999&zoom=3)。
@@ -11,6 +15,9 @@ Highcharts 中国地图和中国各省市（下至县级市、区）地图 geo �
 - 文件名以 `行政区域代码.js` 方式命名，所以需先了解中国行政区域代码
 - 请求的行政区域包含子区域时，文件名为 `${adcode}_full.js`，如：北京市
 - 请求的行政区域不包含子区域，文件名为 `${adcode}.js`，如：东城区
+
+**特别说明**
+- `info/china.json` 来自于 ECharts 及其它途径的综合处理，是一份把**南海诸岛单独作为右下角区域**展示的地理数据，格式和 DataV 不一致，经过处理后生成可用文件位于 `highmaps/china.js`
 
 ## 使用方法
 
@@ -61,14 +68,18 @@ const options = {
 
 2. 怎么判断应该用 `${code}_full.js` 还是 `${code}.js`？
     
-    答：如果请求数据的时候你已经知道是不是最小粒度那直接判断即可。如果你还没有办法判断，那么 `utils/infos.json` 文件列出了所有的行政区域相关信息，你可以通过这份文件判断一个行政区域是否有子区域。你需要做的就是通过这份文件处理得到一个你想要的对象，如： `adcodeInfo = { 100000: true, 110101: false}`
+    答：如果请求数据的时候你已经知道是不是最小粒度那直接判断即可。如果你还没有办法判断，那么 `utils/infos.json` 文件列出了所有的行政区域相关信息，你可以通过这份文件判断一个行政区域是否有子区域。你需要做的就是通过这份文件处理得到一个你想要的对象，如： `adcodeInfo = { 100000: true, 110101: false}`，你也可以通过 `adcode` 的规则来判断。
+
+3. 南海诸岛怎么显示在右下角？
+
+    答：当你需要把南海诸岛显示在右下角时，请求地图数据换成 `highmaps/china.js`，而不是 `highmaps/100000_full.js`。
 
 ## 自定义构建
 
 1. `npm install` 安装依赖包
-2. `npm run clear` 删除现有 `highmaps/*.js` 
+2. `npm run clear_mapjs` 删除现有 `highmaps/*.js` 
 3. 可选，如果你需要更新原始 geo 数据
-   1.  `npm run clear_geo` 删除现有文件
+   1.  `npm run clear_mapgeo` 删除现有文件
    2.  `npm run download` 重新从 DataV 下载 geo 文件，一次执行可能有些会失败，多执行几次，直至无报错即可
 5. `npm run transfer [joinBy]`，`joinBy` 为自定义的值，不传默认为 `adcode`
 

@@ -5,8 +5,8 @@
   "scripts": {
     "download": "node ./scripts/download.js",
     "transfer": "node ./scripts/transfer.js $*",
-    "clear": "rm ./highmaps/*",
-    "clear_geo": "rm ./latlng/*"
+    "clear_mapjs": "rm ./highmaps/*",
+    "clear_mapgeo": "rm ./latlng/*"
   },
   "repository": {
     "type": "git",
