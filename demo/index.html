@@ -18,8 +18,8 @@
       }
       #container {
         width: 100vw;
-        /* height: 90vh; */
-        height: 400px;
+        height: 90vh;
+        /* height: 400px; */
         margin: 0 auto;
       }
     </style>
@@ -75,12 +75,18 @@
                  * 这样你需要单独处理钻取的面包屑
                  */
                 if (!e.seriesOptions) {
-                  const subAdcode = e.point.drilldown;
+                  let subAdcode = e.point.drilldown;
                   if(!hasChildRegion(subAdcode)){
                     return;
                   }
                   const chart = this;
                   chart.showLoading(`<i class="icon-frown"></i> 请求数据... ${e.point.name}`);
+
+                  // 若中国地图南海诸岛在右下角显示，则海南省同样在右下角
+                  if(flag % 2 && subAdcode == 460000){
+                    subAdcode = "hainan"
+                  }
+
                   getData(subAdcode, (mapData, data) => {
                     chart.hideLoading();
                     chart.addSeriesAsDrilldown(e.point, {

@@ -40,7 +40,6 @@ const sourceDir = path.resolve(__dirname, "../latlng");
 const targetDir = path.resolve(__dirname, "../highmaps");
 
 const infoPath = path.resolve(__dirname, "../info");
-const chinaSplitSouth = path.resolve(__dirname, "../info/china.json");
 const adCodeObj = require("./download").adCodeObj;
 
 const transform = {
@@ -87,13 +86,14 @@ function startTransfer() {
     });
   });
 
-  handleSouthGeo();
+  transferChinaWithSouth();
+  transfer("hainan", `${infoPath}/hainan_geo.json`, true);
 }
 
 // china.json 并非来自 dataV，所以需将其处理成和 latlng/*.json 格式一致
 // 次函数会生成一个南海诸岛在右下角的中国地图 highmaps/china.js
-function handleSouthGeo() {
-  const rawStr = fs.readFileSync(chinaSplitSouth, "utf8");
+function transferChinaWithSouth() {
+  const rawStr = fs.readFileSync(`${infoPath}/china.json`, "utf8");
   const geo = JSON.parse(rawStr);
   geo.features.forEach((f) => {
     f.properties = genProperties(f.properties.id);

@@ -18,6 +18,9 @@ Highcharts 中国地图和中国各省市（下至县级市、区）地图 geo �
 
 **特别说明**
 - `info/china.json` 来自于 ECharts 及其它途径的综合处理，是一份把**南海诸岛单独作为右下角区域**展示的地理数据，格式和 DataV 不一致，经过处理后生成可用文件位于 `highmaps/china.js`
+- `info/hainan_geo.json` 是把海南省三沙市（即把南海诸岛）部分删除的地理数据，经过处理后生成可用文件位于 `highmaps/hainan.js`
+
+如果你使用的是 `china.js` 说明没有把三沙市算作海南省，那么钻取到海南省时，需请求 `hainan.js`，你也可以不需要 `hainan.js`，而是请求 `460000_full.js` 后用 JavaScript 语法把三沙市剔除。
 
 ## 使用方法
 

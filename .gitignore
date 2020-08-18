@@ -2,6 +2,7 @@
 node_modules
 
 /docs
+nanhai.js
 
 package-lock.json
 
